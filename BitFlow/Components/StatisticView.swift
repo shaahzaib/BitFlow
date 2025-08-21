@@ -15,7 +15,7 @@ struct StatisticView: View {
         VStack {
             Text(stat.title)
                 .font(.caption)
-                .foregroundStyle(Color.secondary)
+                .foregroundStyle(Color.softGray)
             
             Text(stat.value)
                 .font(.headline)

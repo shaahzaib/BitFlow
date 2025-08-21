@@ -10,26 +10,36 @@ import SwiftUI
 struct HomeView: View {
     
     @EnvironmentObject var coinVM : CoinViewModel
-    @State private var showProfile: Bool = false
+    @State private var showProfile: Bool = false // for animation
+    @State private var showProfileView : Bool = false // to switch view
+    
+    @State private var selectedCoin: CoinModel? = nil
+    @State private var showDetails: Bool = false
     
     var body: some View {
         ZStack{
         Color.bgColor.ignoresSafeArea()
-            
+                .sheet(isPresented: $showProfileView, content: {
+                    ProfileView()
+                        .environmentObject(coinVM)
+                })
             
             
             VStack(spacing: 0){
-              
                 // header
                 HomeViewHeader
                 
+                //statistics
+                StatsHomeView(showProfile: $showProfile)
+                
+                // searchBar
+                SearchBarView(searchText: $coinVM.searchtext)
                 Spacer()
+                
                 // titles
                 TitleBar
                 
-                
                 // coin listings
-                
                 if !showProfile{
                     AllCoins
                         .transition(.move(edge: .leading))
@@ -38,12 +48,14 @@ struct HomeView: View {
                    ProfileCoins
                         .transition(.move(edge: .trailing))
                 }
-                
-                
-             
                 Spacer(minLength: 0)
                 
             }
+            .background(
+                NavigationLink(destination: CoinDetailLoadingView(coin: $selectedCoin),
+                    isActive: $showDetails,
+                    label: {EmptyView()})
+            )
             
             
         }
@@ -68,6 +80,11 @@ extension HomeView{
         HStack{
             CircleButton(iconName: showProfile ? "plus" : "info")
                 .animation(.none,value: showProfile)
+                .onTapGesture {
+                    if showProfile{
+                        showProfileView.toggle()
+                    }
+                }
                 .background(
                     CircleButtonAnimation(animate: $showProfile)
                 )
@@ -99,9 +116,11 @@ extension HomeView{
             ForEach(coinVM.allCoins){coin in
                 CoinRowView(coin: coin, showHoldings: false)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 10))
+                    .onTapGesture {
+                        segue(coin: coin)
+                    }
         }
-
-            .listRowBackground(Color.bgColor)
+         .listRowBackground(Color.bgColor)
         }
         .scrollContentBackground(.hidden)
     }
@@ -112,6 +131,9 @@ extension HomeView{
             ForEach(coinVM.profileCoins){coin in
                 CoinRowView(coin: coin, showHoldings: true)
                     .listRowInsets(.init(top: 10, leading: 0, bottom: 10, trailing: 0))
+                    .onTapGesture {
+                        segue(coin: coin)
+                    }
         }
            .listRowBackground(Color.bgColor)
         }
@@ -119,24 +141,48 @@ extension HomeView{
        
     }
     
+    
+    //MARK: - Segue
+    private func segue(coin: CoinModel){
+        selectedCoin = coin
+        showDetails.toggle()
+    }
+    
     //MARK: -TitleBar
     private var TitleBar:some View{
         
         HStack{
-            
-            Text("Coin")
-            
+            HStack{
+                Text("Coin")
+                
+                Image(systemName: "chevron.down")
+                    .opacity((coinVM.sortOption == .price || coinVM.sortOption == .priceRevesed) ? 1.0 : 0.0 )
+                    .rotationEffect(Angle(degrees: coinVM.sortOption == .price ? 0 : 180 ))
+            }
+            .onTapGesture {
+                withAnimation(.default) {
+                    coinVM.sortOption = coinVM.sortOption == .price ? .priceRevesed : .price
+                }
+            }
             Spacer()
-            
             if  showProfile{
                 Text("Holdings")
             }
             
             Text("Price")
+            .frame(width: UIScreen.main.bounds.width / 3.5, alignment: .trailing)
             
-                .frame(width: UIScreen.main.bounds.width / 3.5, alignment: .trailing)
+            Button {
+                withAnimation(.linear(duration: 2.0)) {
+                    coinVM.reloadCoins()
+                }
+            } label: {
+                Image(systemName: "goforward")
+            }
+            .rotationEffect(Angle(degrees: coinVM.isLoading ? 360 : 0), anchor: .center)
+
         }
-        .font(.caption)
+        .font(.callout)
         .foregroundStyle(Color.Accent)
         .padding(.horizontal,40)
         

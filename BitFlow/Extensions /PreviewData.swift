@@ -7,6 +7,12 @@
 
 import Foundation
 
+
+let coinVM = CoinViewModel()
+let stat1 = StatisticsModel(title: "Market Cap", value: "$13.7Bn", percentageChange: 27.33)
+let stat2 = StatisticsModel(title: "Total  volume", value: "1.26Tr")
+let stat3 = StatisticsModel(title: "Portfolio value", value: "$10.7k", percentageChange: -7.34)
+
 var CoinPreviewData = CoinModel(
     id: "bitcoin",
     symbol: "btc",

@@ -17,11 +17,8 @@ struct CoinRowView: View {
         ZStack {
           Color.bgColor.ignoresSafeArea()
             HStack(spacing: 0){
-                
-                
                 // coin symbol and image
                 ShowCoin
-                
                 Spacer()
                 
                 // current holdings
@@ -36,8 +33,8 @@ struct CoinRowView: View {
             }
             .padding(.horizontal,10)
             .frame(height: 70)
-            .background(Color.softgray.opacity(0.04))
-            .cornerRadius(15)
+            .background(Color.softgray.opacity(0.02))
+            .cornerRadius(10)
             
             
         }
@@ -56,14 +53,15 @@ extension CoinRowView{
     
     private var ShowCoin : some View{
         HStack(spacing: 0) {
-            Circle()
+            CoinImageView(coin: coin)
                 .frame(width: 40, height: 40)
             
-            Text(coin.symbol? .uppercased() ?? "00")
+            Text(coin.symbol .uppercased() )
                 .font(.headline)
                 .foregroundStyle(Color.softgray)
                 .padding(.leading,6)
         }
+        
     }
     
     private var Holdings:some View{
@@ -74,7 +72,7 @@ extension CoinRowView{
                 .font(.callout)
                 .foregroundStyle(Color.Gold)
             Text((coin.currentHoldings ?? 0 ).asNumberString())
-                .foregroundStyle(Color.Gold)
+                .foregroundStyle(Color.softGray)
         }
         
         
@@ -82,7 +80,7 @@ extension CoinRowView{
     
     private var Stats: some View{
         VStack(alignment: .trailing){
-            Text(coin.currentPrice?.asCurrency() ?? "00")
+            Text(coin.currentPrice.asCurrency())
                 .bold()
                 .foregroundStyle(Color.softgray)
             

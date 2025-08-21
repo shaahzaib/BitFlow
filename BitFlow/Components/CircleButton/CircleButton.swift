@@ -19,7 +19,7 @@ struct CircleButton: View {
                 Circle()
                     .foregroundStyle(Color.bgColor)
             )
-            .shadow(color: Color.Accent.opacity(0.2),radius:5,x: 0,y: 0)
+            .shadow(color: Color.Accent.opacity(0.5),radius:3,x: 0,y: 0)
             .padding()
     }
 }
