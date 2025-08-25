@@ -15,8 +15,6 @@ struct ProfileView: View {
     @State private var showCheckMark: Bool = false
     
     var body: some View {
-     
-            
             NavigationView{
                 ZStack {
                     Color.bgColor.ignoresSafeArea()
@@ -26,7 +24,6 @@ struct ProfileView: View {
                         
                         // search results
                         ResultCoinList
-                        
                         
                         // input section
                         if selectedCoin != nil{
@@ -40,8 +37,8 @@ struct ProfileView: View {
                         navBarButton
                     }
                 }
-                .onChange(of: vm.searchtext) { value in
-                    if value == ""{
+                .onChange(of: vm.searchtext) {
+                    if vm.searchtext.isEmpty {
                         removeSelectedCoin()
                     }
                 }

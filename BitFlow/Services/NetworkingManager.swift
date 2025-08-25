@@ -23,6 +23,7 @@ class NetworkingManager{
                 return output.data
             }
             .receive(on: DispatchQueue.main)
+            .retry(3)
             .eraseToAnyPublisher()
     }
 

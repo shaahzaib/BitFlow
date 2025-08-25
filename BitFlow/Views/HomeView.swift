@@ -11,53 +11,53 @@ struct HomeView: View {
     
     @EnvironmentObject var coinVM : CoinViewModel
     @State private var showProfile: Bool = false // for animation
-    @State private var showProfileView : Bool = false // to switch view
-    
+    @State private var showProfileView : Bool = false // to switch to Profile View
+    @State private var showsettingsView : Bool = false // to switch to Settings View
     @State private var selectedCoin: CoinModel? = nil
     @State private var showDetails: Bool = false
     
     var body: some View {
-        ZStack{
-        Color.bgColor.ignoresSafeArea()
-                .sheet(isPresented: $showProfileView, content: {
-                    ProfileView()
-                        .environmentObject(coinVM)
+        NavigationStack {
+            ZStack{
+                Color.bgColor.ignoresSafeArea()
+                    .sheet(isPresented: $showProfileView, content: {
+                        ProfileView()
+                            .environmentObject(coinVM)
+                    })
+                
+                
+                VStack(spacing: 0){
+                    // header
+                    HomeViewHeader
+                    
+                    //statistics
+                    StatsHomeView(showProfile: $showProfile)
+                    
+                    // searchBar
+                    SearchBarView(searchText: $coinVM.searchtext)
+                    Spacer()
+                    
+                    // titles
+                    TitleBar
+                    
+                    // coin listings
+                    if !showProfile{
+                        AllCoins
+                            .transition(.move(edge: .leading))
+                    }
+                    else{
+                        ProfileCoins
+                            .transition(.move(edge: .trailing))
+                    }
+                    Spacer(minLength: 0)
+                    
+                }
+                .sheet(isPresented: $showsettingsView, content: {
+                    SettingsView()
                 })
-            
-            
-            VStack(spacing: 0){
-                // header
-                HomeViewHeader
-                
-                //statistics
-                StatsHomeView(showProfile: $showProfile)
-                
-                // searchBar
-                SearchBarView(searchText: $coinVM.searchtext)
-                Spacer()
-                
-                // titles
-                TitleBar
-                
-                // coin listings
-                if !showProfile{
-                    AllCoins
-                        .transition(.move(edge: .leading))
-                }
-                else{
-                   ProfileCoins
-                        .transition(.move(edge: .trailing))
-                }
-                Spacer(minLength: 0)
-                
             }
-            .background(
-                NavigationLink(destination: CoinDetailLoadingView(coin: $selectedCoin),
-                    isActive: $showDetails,
-                    label: {EmptyView()})
-            )
-            
-            
+            .navigationDestination(isPresented: $showDetails) {
+                CoinDetailLoadingView(coin: $selectedCoin)                            }
         }
     }
     
@@ -83,6 +83,8 @@ extension HomeView{
                 .onTapGesture {
                     if showProfile{
                         showProfileView.toggle()
+                    }else{
+                        showsettingsView.toggle()
                     }
                 }
                 .background(
